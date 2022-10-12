@@ -787,3 +787,83 @@ def youtube_statespaces_repro(): # to run
     ])
 
     return sweep
+
+
+def youtube_statespaces_repro_june_22():
+    sweep = prod([
+        flag("experiment", ['sashimi-youtubemix']),
+    ])
+
+    return sweep
+
+def youtube_measures():
+    sweep = prod([
+        flag("experiment", ['sashimi-youtubemix']),
+        flag("model.layer.measure", ['fourier']),
+    ])
+
+    return sweep
+
+
+def youtube_measures_2():
+    sweep = prod([
+        flag("experiment", ['sashimi-youtubemix']),
+        flag("model.layer.measure", ['diag-linear']),
+    ])
+
+    return sweep
+
+def youtube_longer():
+    sweep = prod([
+        flag("experiment", ['sashimi-youtubemix']),
+        flag("dataset.sample_len", [262144]),
+    ])
+
+    return sweep
+
+def youtube_measures_3():
+    sweep = prod([
+        flag("experiment", ['sashimi-youtubemix']),
+        flag("model.layer.measure", ['diag-linear', 'diag-inv', 'diag']),
+        flag("model.layer.n_ssm", [None]),
+        flag("+model.layer.lr_dt", [0.004]),
+    ])
+
+    return sweep
+
+def youtube_measures_4():
+    sweep = prod([
+        flag("experiment", ['sashimi-youtubemix']),
+        flag("model.layer.measure", ['diag-legs']),
+        flag("model.layer.n_ssm", [None]),
+        flag("+model.layer.lr_dt", [0.004]),
+    ])
+
+    return sweep
+
+
+def youtube_measures_5():
+    sweep = prod([
+        flag("experiment", ['sashimi-youtubemix']),
+        flag("model.layer.measure", ['diag-inv']),
+        flag("+model.layer.lr_dt", [0.001]),
+        flag("optimizer.lr", [0.001]),
+    ])
+
+    return sweep
+
+def sc09_statespaces_repro_june_22(): # 22-06-28-13-20-30--utils.hippo.music.s4--sc09_statespaces_repro_june_22
+    sweep = prod([
+        flag("experiment", ['sashimi-sc09']),
+        flag("model.layer.measure", ['legs', 'diag-linear']),
+    ])
+
+    return sweep
+
+def beethoven_statespaces_repro_june_22(): # 22-06-28-13-20-45--utils.hippo.music.s4--beethoven_statespaces_repro_june_22
+    sweep = prod([
+        flag("experiment", ['sashimi-beethoven']),
+        flag("model.layer.measure", ['legs', 'diag-linear']),
+    ])
+
+    return sweep

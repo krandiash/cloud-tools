@@ -207,6 +207,43 @@ class HippoGCPFineGrained(Options):
         return cmd
 
 
+
+@dataclass
+class MeerkatGCPFineGrained(Options):
+    DEFAULT_IMAGE = 'gcr.io/hai-gcp-fine-grained/default'
+    CONDA_ACTIVATION_PATH = '/home/common/miniconda3/etc/profile.d/conda.sh'
+    BASH_RC_PATH = '/home/sabri/.startup.sh'
+    DEFAULT_CONDA_ENV = 'meerkat9'
+    DEFAULT_STARTUP_DIR = '/home/sabri/'
+    BASE_POD_YAML_PATH = 'utils/pod-meerkat-gcp-fine-grained.yaml'
+    NODE_POOLS = ['a100-80g-1', 'a100-40g-1', 't4-1-p']
+    JOBLOG_DIR = './joblogs'
+    GCP_PROJECT = 'hai-gcp-fine-grained'
+    GCP_ZONE = 'europe-west4-a'
+    GCP_CLUSTER = 'cluster-2'
+    WANDB_PATH = None # '/home/workspace/.wandb/auth'
+
+    PREEMPTIBLE_POOLS = ['a100-80g-1', 'a100-40g-1', 't4-1-p']
+
+    @staticmethod
+    def main_command(run_name, args, dryrun=False):
+        """
+        Return the main command to be run on the cluster.
+
+        Args:
+            run_name (str): The name of the run.
+            args (dict): The arguments to be passed to the main command.
+            dryrun (bool): Whether to run the command in dryrun mode.
+
+        Returns:
+            str: The main command to be run on the cluster.
+        """
+        if dryrun:
+            cmd = f"python -m train wandb=null {' '.join(args)}"
+        else:
+            cmd = f"python -m train wandb.group={run_name} {' '.join(args)}"
+        return cmd
+
 DEFAULTS = {
     'unagi-gcp-fg': UnagiGCPFineGrained(),
     'hippo-gcp-hippo': HippoGCPHippo(),
@@ -214,6 +251,7 @@ DEFAULTS = {
     'hippo-gcp-hippo-europe-2': HippoGCPHippoEurope2(),
     'hippo-gcp-hippo-central': HippoGCPHippoCentral(),
     'hippo-gcp-fg': HippoGCPFineGrained(),
+    'meerkat-gcp-fg': MeerkatGCPFineGrained(),
 
     'platypus-1': HippoGCPHippo(),
     'platypus-2': HippoGCPHippoEurope(),

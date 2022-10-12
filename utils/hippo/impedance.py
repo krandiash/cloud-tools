@@ -155,5 +155,89 @@ def s4_impedance_final_1():
 
     return sweep
 
+def conv1d_impedance_final_1():
+
+    sweep = prod([
+        flag("train.seed", [1, 2, 3]),
+        flag("experiment", ['s4-impedance']),
+        flag("model/layer", ['conv1d']),
+        flag("model.dropout", [0.2, 0.3]),
+        flag("optimizer.weight_decay", [0.10, 0.20, 0.30]),
+        flag("model.n_layers", [4, 6]),
+        flag("optimizer.lr", [0.01]),
+    ])
+    # Might need to be trained longer
+
+    return sweep
+
+def conv1d_impedance_final_2():
+    # Longer training
+    sweep = prod([
+        flag("train.seed", [1, 2, 3]),
+        flag("experiment", ['s4-impedance']),
+        flag("model/layer", ['conv1d']),
+        flag("model.dropout", [0.2, 0.3]),
+        flag("optimizer.weight_decay", [0.10, 0.20, 0.30]),
+        flag("model.n_layers", [4, 6]),
+        flag("optimizer.lr", [0.01]),
+        flag("trainer.max_epochs", [100]),
+        flag("scheduler.t_initial", [100]),
+    ])
+
+    return sweep
+
+def lstm_impedance_final_1():
+
+    sweep = prod([
+        flag("train.seed", [1, 2, 3]),
+        flag("experiment", ['s4-impedance']),
+        flag("model", ['rnn/lstm']),
+        flag("model.dropout", [0.2, 0.3]),
+        flag("optimizer.weight_decay", [0.10, 0.20, 0.30]),
+        flag("model.n_layers", [4, 6]),
+        flag("optimizer.lr", [0.01]),  
+        flag("trainer.max_epochs", [100]),
+        flag("scheduler.t_initial", [100]),      
+    ])
+
+    return sweep
+
+def transformer_impedance_final_1():
+
+    sweep = prod([
+        flag("train.seed", [1, 2, 3]),
+        flag("experiment", ['s4-impedance']),
+        flag("model", ['transformer']),
+        flag("model.d_model", [256]),
+        flag("model.dropout", [0.2, 0.3]),
+        flag("optimizer.weight_decay", [0.10, 0.20, 0.30]),
+        flag("model.n_layers", [4, 6]),
+        flag("optimizer.lr", [0.01]),
+        flag("trainer.max_epochs", [100]),
+        flag("scheduler.t_initial", [100]),
+    ])
+
+    return sweep
+
+def s4_impedance_final_2():
+
+    sweep = prod([
+        flag("train.seed", [1, 2, 3]),
+        flag("experiment", ['s4-impedance']),
+        flag("model.dropout", [0.3]),
+        flag("optimizer.weight_decay", [0.20]),
+        flag("model.n_layers", [4, 6]),
+        flag("model.layer.bidirectional", [True]),
+        flag("model.layer.postact", ['glu']),
+        flag("optimizer.lr", [0.01]),
+        flag("+model.layer.lr_dt", [0.01]),
+        lzip([
+            flag("model.layer.measure", ['legs', 'fourier', 'random-inv', 'random-linear', 'hippo', 'all']),
+            flag("model.layer.n_ssm", [1, 1, 1, 1, 4, 4]),
+        ]),
+    ])
+
+    return sweep
+
 
 # python -m checkpoints.visualize_2 wandb=null experiment=s4-impedance model.dropout=0.3 model.n_layers=4 model.layer.bidirectional=True model.layer.postact=glu train.checkpoint_path=/home/workspace/hippo/outputs/2022-05-07/04-55-32-287949/checkpoints/val/AUROC.ckpt  train.visualizer=impedance loader.drop_last=false

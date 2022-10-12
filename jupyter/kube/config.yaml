@@ -18,7 +18,7 @@ hub:
       admin_users:
         - krandiash
     DummyAuthenticator:
-      password: cheesebagel
+      password: jupyter123
 
 scheduling:
   userScheduler: # pack users tight on some nodes and let other nodes become empty and scaled down
@@ -67,8 +67,8 @@ singleuser:
         persistentVolumeClaim:
           claimName: pvc-1
       - name: dshm
-        emptyDir:
           medium: Memory
+        emptyDir:
     extraVolumeMounts:
       - name: pv-1
         mountPath: /home/

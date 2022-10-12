@@ -581,11 +581,14 @@ def cifar_progres_conv1d_final_sweep_1():
 
 def cifar_progres_conv1d_final_sweep_2():
     # Conv1D results with augmentation; 2 seeds
+    # Reran due to bug
     sweep = prod(
         [
             flag("train.seed", [0, 1]),
             flag("experiment", ["progres/cnn-cifar-2d"]),
-            flag("loader.train_resolution", [1]),
+            flag("callbacks.progressive_resizing.stage_params", [
+                '"[{resolution:1,epochs:100}]"'
+            ]),
             flag("dataset.augment", [True]),
             flag("model.layer.depthwise", [True, False]),
             lzip([
@@ -602,11 +605,40 @@ def cifar_progres_conv1d_final_sweep_2():
 
 def cifar_progres_conv1d_final_sweep_3():
     # Conv1D results lower-res training zero-shot no augmentation; 2 seeds
+    # Reran due to bug
     sweep = prod(
         [
             flag("train.seed", [0, 1]),
             flag("experiment", ["progres/cnn-cifar-2d"]),
-            flag("loader.train_resolution", [4, 2, 1]),
+            flag("callbacks.progressive_resizing.stage_params", [
+                '"[{resolution:1,epochs:100}]"',
+                '"[{resolution:2,epochs:100}]"',
+                '"[{resolution:4,epochs:100}]"',
+            ]),
+            flag("dataset.augment", [False]),
+            flag("model.layer.depthwise", [True, False]),
+            lzip([
+                flag("model.n_layers", [6, 8]),
+                flag("model.d_model", [256, 512]),    
+                flag("optimizer.weight_decay", [0.03, 0.05]),
+            ]),
+            flag("loader.img_size", [32]),
+            flag("loader.eval_resolutions", [[1, 2, 4]]),
+        ]
+    )
+
+    return sweep
+
+def cifar_progres_conv1d_final_sweep_4():
+    # Progressive resizing with Conv2D, 50-50 schedule
+    sweep = prod(
+        [
+            flag("train.seed", [0]),
+            flag("experiment", ["progres/cnn-cifar-2d"]),
+            flag("callbacks.progressive_resizing.stage_params", [
+                '"[{resolution:4,epochs:50,scheduler:{num_training_steps:50000}},{resolution:1,epochs:50,scheduler:{num_training_steps:50000}}]"',
+                '"[{resolution:2,epochs:50,scheduler:{num_training_steps:50000}},{resolution:1,epochs:50,scheduler:{num_training_steps:50000}}]"',
+            ]),
             flag("dataset.augment", [False]),
             flag("model.layer.depthwise", [True, False]),
             lzip([

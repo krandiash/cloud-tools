@@ -28,9 +28,9 @@ spec:
           privileged: true
         volumeMounts:
           - mountPath: /exports
-            name: central-pd-1
+            name: pd-home-europe-1
       volumes:
-        - name: central-pd-1
+        - name: pd-home-europe-1
           gcePersistentDisk:
-            pdName: central-pd-1
+            pdName: pd-home-europe-1
             fsType: ext4

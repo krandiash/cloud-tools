@@ -91,16 +91,19 @@ def commands(pool, cmd, startup_dir, conda_env):
     # (e.g. if need to use different setups for different GPUs)
     conda_env = pool_dependent_conda_env(pool, conda_env)
     return [
-        'sudo apt-key del 7fa2af80',
+        # 'sudo apt-key del 7fa2af80',
+        'apt-key del 7fa2af80',
         'wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-keyring_1.0-1_all.deb',
-        'sudo dpkg -i cuda-keyring_1.0-1_all.deb',
+        # 'sudo dpkg -i cuda-keyring_1.0-1_all.deb',
+        'dpkg -i cuda-keyring_1.0-1_all.deb',
         'rm /etc/apt/sources.list.d/cuda.list',
-        'curl -sL "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF60F4B3D7FA2AF80" | sudo apt-key add -',
+        # 'curl -sL "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF60F4B3D7FA2AF80" | sudo apt-key add -',
+        'curl -sL "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF60F4B3D7FA2AF80" | apt-key add -',
         'apt-get update -y',
         'apt-get install -y libsndfile1-dev',
         f'source {DEFAULT.BASH_RC_PATH}' if DEFAULT.BASH_RC_PATH else 'sleep 1',
         f'source {DEFAULT.CONDA_ACTIVATION_PATH}' if DEFAULT.CONDA_ACTIVATION_PATH else 'sleep 1',
-        f'conda activate {conda_env}' if conda_env else 'sleep 1',
+        f'conda activate {conda_env}' if conda_env and DEFAULT.CONDA_ACTIVATION_PATH else 'sleep 1',
         f'cd {startup_dir}' if startup_dir else 'sleep 1',
         f'bash {DEFAULT.WANDB_PATH}' if DEFAULT.WANDB_PATH else 'sleep 1',
         # 'bash /home/.wandb/auth',
@@ -121,9 +124,11 @@ def launch_pod(run_name, pool, image, cmd, startup_dir, conda_env, as_job=False)
     config['spec']['nodeSelector']['cloud.google.com/gke-nodepool'] = f'{pool}'
     # Request GPUs
     # TODO(karan): figure out how to parse GPU requests from pool name or add option in cmdline
+    if pool.endswith('-p'): n_gpus = pool.split("-")[1]
+    else: n_gpus = pool.split("-")[-1]
     config['spec']['containers'][0]['resources'] = {
-        'limits': {'nvidia.com/gpu': pool.split("-")[1]},
-        'requests': {'nvidia.com/gpu': pool.split("-")[1]}
+        'limits': {'nvidia.com/gpu': n_gpus},
+        'requests': {'nvidia.com/gpu': n_gpus}
     }
 
     # Set the name of the Pod
