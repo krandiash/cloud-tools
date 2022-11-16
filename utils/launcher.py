@@ -101,6 +101,7 @@ def commands(pool, cmd, startup_dir, conda_env):
         'curl -sL "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF60F4B3D7FA2AF80" | apt-key add -',
         'apt-get update -y',
         'apt-get install -y libsndfile1-dev',
+        'apt-get install -y git-lfs',
         f'source {DEFAULT.BASH_RC_PATH}' if DEFAULT.BASH_RC_PATH else 'sleep 1',
         f'source {DEFAULT.CONDA_ACTIVATION_PATH}' if DEFAULT.CONDA_ACTIVATION_PATH else 'sleep 1',
         f'conda activate {conda_env}' if conda_env and DEFAULT.CONDA_ACTIVATION_PATH else 'sleep 1',
@@ -202,6 +203,7 @@ def run(args):
         sweep_fn = getattr(config, args.sweep)
         config_name = args.config.split('.')[-1]
         run_name = f'{timestamp}--{config_name}--{args.sweep}'
+        run_name = run_name.replace(".", "-").replace("_", "-").lower().rstrip("-")
         # Generate the commands
         f, cmds = cmdruns(timestamp, run_name, sweep_fn, args.envvars, args.dryrun)
     else:
@@ -225,7 +227,8 @@ def run(args):
         print(f"Launching pods...\nPool: {args.pool}\nImage: {DEFAULT.DEFAULT_IMAGE}")
         for run_name, cmd in cmds.items():
             launch_pod(
-                run_name.replace(".", "-").replace("_", "-")[:60].lower().rstrip("-"),
+                # run_name.replace(".", "-").replace("_", "-")[:60].lower().rstrip("-"),
+                run_name[:60],
                 args.pool,
                 DEFAULT.DEFAULT_IMAGE,
                 cmd,
